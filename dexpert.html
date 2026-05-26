@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DEXPERT — Intelligent Presentation Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --o:#E8761A;
+  --o-light:#FEF3E8;
+  --o-mid:#F9D9B8;
+  --ink:#0E0E0E;
+  --muted:#7A7570;
+  --rule:#E4E0DB;
+  --bg:#F7F5F2;
+  --white:#FFFFFF;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Epilogue',sans-serif;color:var(--ink)}
+
+.deck{width:100%;height:100vh;position:relative}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+
+/* BAR */
+.bar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;border-bottom:1px solid var(--rule);flex-shrink:0;background:var(--white)}
+.logo{font-size:16px;font-weight:800;letter-spacing:-0.5px;color:var(--ink)}
+.logo span{color:var(--o)}
+.bar-meta{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.bar-right{display:flex;align-items:center;gap:16px}
+.prog{font-size:11px;font-weight:600;color:var(--muted)}
+.dots{display:flex;gap:5px;align-items:center}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--rule);border:none;cursor:pointer;padding:0;transition:all 0.2s}
+.dot.active{background:var(--o);width:16px;border-radius:3px}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .a1{animation:fadeUp 0.4s ease 0.04s forwards;opacity:0}
+.slide.active .a2{animation:fadeUp 0.4s ease 0.13s forwards;opacity:0}
+.slide.active .a3{animation:fadeUp 0.4s ease 0.22s forwards;opacity:0}
+.slide.active .a4{animation:fadeUp 0.4s ease 0.31s forwards;opacity:0}
+.slide.active .a5{animation:fadeUp 0.4s ease 0.38s forwards;opacity:0}
+
+/* ---- SHARED LAYOUTS ---- */
+.two-col{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.three-col{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;overflow:hidden}
+.col-l{padding:52px 48px;border-right:1px solid var(--rule);display:flex;flex-direction:column}
+.col-r{padding:52px 48px;display:flex;flex-direction:column}
+.col-dark{background:var(--ink)}
+.col-bg{background:var(--bg)}
+.col-white{background:var(--white)}
+
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.eyebrow-light{color:#555}
+.big-h{font-size:48px;font-weight:800;line-height:1.0;letter-spacing:-1.5px;color:var(--ink)}
+.big-h-light{color:var(--white)}
+.big-h em{color:var(--o);font-style:normal}
+.body-txt{font-size:14px;font-weight:400;color:var(--muted);line-height:1.65;margin-top:20px}
+.body-txt-light{color:#888}
+
+.divider{width:100%;height:1px;background:var(--rule);margin:28px 0}
+.divider-dark{background:#1E1E1E}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:0;margin-top:auto}
+.stat-item{flex:1;padding-top:20px;border-top:2px solid var(--rule)}
+.stat-item+.stat-item{margin-left:32px}
+.stat-n{font-size:32px;font-weight:800;letter-spacing:-1px;color:var(--o);line-height:1}
+.stat-l{font-size:11px;font-weight:400;color:var(--muted);margin-top:5px;line-height:1.4}
+
+/* NUMBERED LIST */
+.n-list{display:flex;flex-direction:column;gap:0;flex:1}
+.n-item{display:grid;grid-template-columns:36px 1fr;gap:0;padding:18px 0;border-bottom:1px solid var(--rule)}
+.n-item:first-child{border-top:1px solid var(--rule)}
+.n-num{font-size:11px;font-weight:700;color:var(--o);padding-top:2px;letter-spacing:0.5px}
+.n-body h3{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.n-body p{font-size:12px;font-weight:400;color:var(--muted);line-height:1.5}
+
+/* DARK LIST */
+.d-list{display:flex;flex-direction:column;gap:0;flex:1}
+.d-item{display:grid;grid-template-columns:36px 1fr;gap:0;padding:18px 0;border-bottom:1px solid #1C1C1C}
+.d-item:first-child{border-top:1px solid #1C1C1C}
+.d-num{font-size:11px;font-weight:700;color:var(--o);padding-top:2px}
+.d-body h3{font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px}
+.d-body p{font-size:12px;font-weight:400;color:#555;line-height:1.5}
+
+/* BVA */
+.check-item{display:flex;gap:14px;align-items:flex-start;padding:15px 0;border-bottom:1px solid var(--rule)}
+.check-item:first-child{border-top:1px solid var(--rule)}
+.check-icon{width:22px;height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.icon-no{background:#F0EDEA;color:#BBBBBB}
+.icon-yes{background:var(--o);color:var(--white)}
+.check-text strong{font-size:13px;font-weight:600;color:var(--ink);display:block;margin-bottom:2px}
+.check-text p{font-size:12px;color:var(--muted);line-height:1.45}
+.dark-check-item{display:flex;gap:14px;align-items:flex-start;padding:15px 0;border-bottom:1px solid #1C1C1C}
+.dark-check-item:first-child{border-top:1px solid #1C1C1C}
+.dark-check-text strong{font-size:13px;font-weight:600;color:var(--white);display:block;margin-bottom:2px}
+.dark-check-text p{font-size:12px;color:#555;line-height:1.45}
+
+/* STEP ROWS */
+.step-item{display:grid;grid-template-columns:48px 1fr auto;gap:0;align-items:start;padding:16px 0;border-bottom:1px solid var(--rule)}
+.step-item:first-child{border-top:1px solid var(--rule)}
+.step-n{font-size:26px;font-weight:800;color:var(--o);letter-spacing:-1px;line-height:1;padding-top:2px}
+.step-b h3{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.step-b p{font-size:12px;color:var(--muted);line-height:1.5}
+.step-tag{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--o);background:var(--o-light);padding:3px 10px;border-radius:20px;white-space:nowrap;align-self:center}
+
+/* ROI METRICS */
+.metric-col{padding:48px;display:flex;flex-direction:column;border-right:1px solid var(--rule)}
+.metric-col:last-child{border-right:none}
+.metric-n{font-size:72px;font-weight:800;letter-spacing:-3px;color:var(--o);line-height:1;margin-bottom:12px}
+.metric-label{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.metric-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.metric-feat-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule);margin-top:auto}
+.metric-feat{padding:20px 0 0}
+.metric-feat:nth-child(1),.metric-feat:nth-child(2){padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.metric-feat:nth-child(2),.metric-feat:nth-child(4){padding-left:32px;border-left:1px solid var(--rule)}
+.metric-feat h4{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.metric-feat h4::before{content:'';width:5px;height:5px;background:var(--o);border-radius:50%;flex-shrink:0}
+.metric-feat p{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+/* CLOSE */
+.close-pill{display:inline-flex;align-items:center;gap:6px;background:var(--o-light);border:1px solid var(--o-mid);color:var(--o);font-size:10px;font-weight:600;letter-spacing:0.5px;padding:4px 12px;border-radius:20px}
+.close-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.close-note{margin-top:auto;border-top:1px solid #1C1C1C;padding-top:20px;font-size:11px;color:#444;line-height:1.6}
+
+/* QUOTE BLOCK */
+.quote-block{margin-top:auto;background:var(--white);border-left:2px solid var(--o);padding:20px 20px 20px 22px;border-radius:0 3px 3px 0}
+.quote-block p{font-size:14px;font-weight:400;color:var(--ink);line-height:1.6}
+.quote-block cite{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-top:10px;font-style:normal}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- BAR -->
+<div class="bar">
+  <div class="logo">DE<span>></span>PERT</div>
+  <div class="bar-meta">Internal Overview · 2026</div>
+  <div class="bar-right">
+    <span class="prog" id="prog">01 / 06</span>
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<!-- S1: HERO -->
+<div class="slide active" id="s0">
+  <div class="two-col">
+    <div class="col-l col-white" style="justify-content:space-between">
+      <div>
+        <div class="eyebrow a1">Intelligent Presentation Engine</div>
+        <h1 class="big-h a2" style="font-size:52px">Build decks<br>in seconds,<br>not <em>hours.</em></h1>
+        <p class="body-txt a3">DEXPERT brings your master data, legacy slides, and compliance logic under one roof — so your team focuses on the pitch, not the assembly.</p>
+      </div>
+      <div class="stats-row a4">
+        <div class="stat-item">
+          <div class="stat-n">10×</div>
+          <div class="stat-l">Faster deck<br>assembly</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-n">Zero</div>
+          <div class="stat-l">Manual compliance<br>checks</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-n">1</div>
+          <div class="stat-l">Source of truth<br>for all teams</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-r col-dark" style="justify-content:space-between">
+      <div class="eyebrow eyebrow-light a1">What teams are saying</div>
+      <div class="a2" style="margin-top:auto">
+        <p style="font-size:28px;font-weight:700;letter-spacing:-0.5px;color:#fff;line-height:1.25;max-width:300px">"Spending a morning on a deck that should take ten minutes."</p>
+        <p style="font-size:13px;color:#555;margin-top:16px;letter-spacing:0.3px">DEXPERT fixes that ratio.</p>
+      </div>
+      <div class="a3" style="display:inline-flex;align-items:center;gap:8px;background:var(--o);color:#fff;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:2px;margin-top:auto;width:fit-content">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Now it actually does
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: PROBLEM -->
+<div class="slide" id="s1">
+  <div class="two-col">
+    <div class="col-l col-bg" style="justify-content:space-between">
+      <div>
+        <div class="eyebrow a1">The problem</div>
+        <h2 class="big-h a2" style="font-size:38px;letter-spacing:-1px">Every deck<br>is a<br>scavenger<br>hunt</h2>
+        <p class="body-txt a3">It's not a skill gap. It's a tooling gap. Teams are solving a process problem with copy-paste.</p>
+      </div>
+      <div class="quote-block a4">
+        <p>"We already made this deck last quarter. Why does it take just as long this time?"</p>
+        <cite>Heard in every sales review, ever</cite>
+      </div>
+    </div>
+    <div class="col-r col-white">
+      <div class="eyebrow a1">Four pressure points</div>
+      <div class="n-list">
+        <div class="n-item a2">
+          <div class="n-num">01</div>
+          <div class="n-body"><h3>Fragmented sources</h3><p>Monthly data, legacy slides, custom content — different places, different owners.</p></div>
+        </div>
+        <div class="n-item a3">
+          <div class="n-num">02</div>
+          <div class="n-body"><h3>Copy-paste marathon</h3><p>Every new deck means digging through old ones, copying, reformatting, hoping nothing's stale.</p></div>
+        </div>
+        <div class="n-item a4">
+          <div class="n-num">03</div>
+          <div class="n-body"><h3>Compliance as afterthought</h3><p>Disclaimer slides added manually — or missed. Every ISIN needs a check. Error-prone, slow.</p></div>
+        </div>
+        <div class="n-item a5">
+          <div class="n-num">04</div>
+          <div class="n-body"><h3>Hours lost every cycle</h3><p>Teams spend more time assembling decks than crafting the pitch. That ratio is backwards.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S3: BEFORE / AFTER -->
+<div class="slide" id="s2">
+  <div class="two-col">
+    <div class="col-l col-bg">
+      <div class="eyebrow a1">Without DEXPERT</div>
+      <h2 class="big-h a2" style="font-size:32px;letter-spacing:-0.5px;margin-bottom:28px">The old way</h2>
+      <div class="a3" style="flex:1;display:flex;flex-direction:column">
+        <div class="check-item">
+          <div class="check-icon icon-no">✕</div>
+          <div class="check-text"><strong>Hunt for slides</strong><p>Search last quarter's deck, email threads, shared drives — wherever they ended up</p></div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon icon-no">✕</div>
+          <div class="check-text"><strong>Copy. Paste. Reformat.</strong><p>Performance slides, chapter slides, registration slides — one by one, manually</p></div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon icon-no">✕</div>
+          <div class="check-text"><strong>Chase compliance sign-off</strong><p>Manual disclaimer checks per ISIN. Multiple rounds before it's cleared</p></div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon icon-no">✕</div>
+          <div class="check-text"><strong>Catch errors late</strong><p>Stale data, missing slides, formatting issues — spotted deep in review</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-r col-dark">
+      <div class="eyebrow eyebrow-light a1">With DEXPERT</div>
+      <h2 class="big-h-light a2" style="font-size:32px;font-weight:800;letter-spacing:-0.5px;margin-bottom:28px">The new way</h2>
+      <div class="a3" style="flex:1;display:flex;flex-direction:column">
+        <div class="dark-check-item">
+          <div class="check-icon icon-yes">✓</div>
+          <div class="dark-check-text"><strong>Pick a recipe or build your own</strong><p>Pre-built flows for APAC decks, investor packs, monthly reviews — one click to start</p></div>
+        </div>
+        <div class="dark-check-item">
+          <div class="check-icon icon-yes">✓</div>
+          <div class="dark-check-text"><strong>Pull everything in one go</strong><p>Live data, legacy slides, custom content — added, ordered, formatted from one place</p></div>
+        </div>
+        <div class="dark-check-item">
+          <div class="check-icon icon-yes">✓</div>
+          <div class="dark-check-text"><strong>ISIN detection handles compliance</strong><p>Reads every ISIN, auto-inserts the right disclaimers. No manual intervention</p></div>
+        </div>
+        <div class="dark-check-item">
+          <div class="check-icon icon-yes">✓</div>
+          <div class="dark-check-text"><strong>Export and done</strong><p>Compliance-ready, formatted, complete — downloaded in seconds</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: HOW IT WORKS -->
+<div class="slide" id="s3">
+  <div class="two-col">
+    <div class="col-l col-white" style="justify-content:space-between">
+      <div>
+        <div class="eyebrow a1">How it works</div>
+        <h2 class="big-h a2" style="font-size:40px;letter-spacing:-1px">Five steps.<br>One tool.<br>Done.</h2>
+        <p class="body-txt a3">Whether you start from a saved recipe or a blank slate — DEXPERT handles the logic so you can focus on the message.</p>
+      </div>
+      <div class="a4" style="background:var(--o);padding:18px 22px;border-radius:3px;margin-top:auto">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:8px">Note</div>
+        <p style="font-size:13px;color:#fff;line-height:1.55">Save your most common deck types as recipes. Your monthly APAC pack becomes one click — every time.</p>
+      </div>
+    </div>
+    <div class="col-r col-bg">
+      <div class="eyebrow a1">The flow</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+        <div class="step-item a2">
+          <div class="step-n">01</div>
+          <div class="step-b"><h3>Choose your starting point</h3><p>Pick a saved recipe or start blank. Recipes remember your preferred slide sequences.</p></div>
+          <div class="step-tag">Recipes</div>
+        </div>
+        <div class="step-item a3">
+          <div class="step-n">02</div>
+          <div class="step-b"><h3>Build and order your slides</h3><p>Add performance, chapter, leadership, registration slides — in any order, from the master source.</p></div>
+          <div class="step-tag">Master data</div>
+        </div>
+        <div class="step-item a4">
+          <div class="step-n">03</div>
+          <div class="step-b"><h3>Attach custom slides</h3><p>Drop in your team's bespoke slides. They sit alongside master content in the final deck.</p></div>
+          <div class="step-tag">Custom</div>
+        </div>
+        <div class="step-item a5">
+          <div class="step-n">04</div>
+          <div class="step-b"><h3>ISIN detection — automatic</h3><p>DEXPERT scans every ISIN, appends the correct disclaimers. Compliance built in, not bolted on.</p></div>
+          <div class="step-tag">Compliance</div>
+        </div>
+        <div class="step-item" style="border-bottom:none">
+          <div class="step-n">05</div>
+          <div class="step-b"><h3>Export your ready deck</h3><p>Download a polished, compliant presentation — what used to take hours, done.</p></div>
+          <div class="step-tag">Export</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5: ROI -->
+<div class="slide" id="s4">
+  <div class="three-col" style="border-bottom:1px solid var(--rule)">
+    <div class="metric-col col-white a1">
+      <div class="eyebrow" style="margin-bottom:auto">Time saved</div>
+      <div style="margin-top:32px">
+        <div class="metric-n">~80<span style="font-size:36px">%</span></div>
+        <div class="metric-label">Faster deck assembly</div>
+        <div class="metric-desc">What used to take a morning now takes minutes — without touching quality.</div>
+      </div>
+    </div>
+    <div class="metric-col col-bg a2">
+      <div class="eyebrow" style="margin-bottom:auto">Compliance</div>
+      <div style="margin-top:32px">
+        <div class="metric-n">0</div>
+        <div class="metric-label">Manual compliance steps</div>
+        <div class="metric-desc">ISIN detection handles every disclaimer automatically at export.</div>
+      </div>
+    </div>
+    <div class="metric-col col-white" style="border-right:none">
+      <div class="eyebrow a3" style="margin-bottom:auto">Coverage</div>
+      <div class="a4" style="margin-top:32px">
+        <div class="metric-n">1</div>
+        <div class="metric-label">Source of truth</div>
+        <div class="metric-desc">Sales, product, and compliance — all working from the same master data, the same tool.</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;flex:0 0 auto">
+    <div style="padding:24px 32px;border-right:1px solid var(--rule)" class="a2">
+      <h4 style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;background:var(--o);border-radius:50%;display:inline-block"></span>Always fresh data</h4>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.5">Live pulls from the master source — no stale figures, ever.</p>
+    </div>
+    <div style="padding:24px 32px;border-right:1px solid var(--rule)" class="a3">
+      <h4 style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;background:var(--o);border-radius:50%;display:inline-block"></span>Saved recipes</h4>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.5">Recurring deck types become one-click workflows.</p>
+    </div>
+    <div style="padding:24px 32px;border-right:1px solid var(--rule)" class="a4">
+      <h4 style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;background:var(--o);border-radius:50%;display:inline-block"></span>Historical archive</h4>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.5">Legacy slides on demand — no email chains, no digging.</p>
+    </div>
+    <div style="padding:24px 32px" class="a5">
+      <h4 style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;background:var(--o);border-radius:50%;display:inline-block"></span>Custom slides included</h4>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.5">Your bespoke content alongside master slides in one unified deck.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6: CLOSE -->
+<div class="slide" id="s5">
+  <div class="two-col">
+    <div class="col-l col-dark" style="justify-content:space-between">
+      <div class="eyebrow eyebrow-light a1">The takeaway</div>
+      <div class="a2">
+        <h2 style="font-size:48px;font-weight:800;letter-spacing:-1.5px;color:#fff;line-height:1.05">Less time<br>building.<br><em style="color:var(--o);font-style:normal">More time</em><br>selling.</h2>
+        <p style="font-size:14px;color:#666;line-height:1.65;margin-top:24px;max-width:300px">DEXPERT removes the part that was never your team's job — the assembling, the chasing, the reformatting.</p>
+      </div>
+      <div class="close-note a3">Built for sales, product, and compliance teams who'd rather spend their time on the message — not the mechanics of making a deck.</div>
+    </div>
+    <div class="col-r col-white" style="justify-content:space-between">
+      <div class="eyebrow a1">What DEXPERT gives you</div>
+      <div class="d-list a2">
+        <div class="d-item" style="border-color:var(--rule)">
+          <div class="d-num" style="color:var(--o)">01</div>
+          <div class="d-body">
+            <h3 style="color:var(--ink)">Intelligent ISIN detection</h3>
+            <p style="color:var(--muted)">Knows which ISINs you're using and what disclaimers they need — automatically.</p>
+          </div>
+        </div>
+        <div class="d-item" style="border-color:var(--rule)">
+          <div class="d-num" style="color:var(--o)">02</div>
+          <div class="d-body">
+            <h3 style="color:var(--ink)">Master data source integration</h3>
+            <p style="color:var(--muted)">Live and historical slides, always available — no manual pulling required.</p>
+          </div>
+        </div>
+        <div class="d-item" style="border-color:var(--rule)">
+          <div class="d-num" style="color:var(--o)">03</div>
+          <div class="d-body">
+            <h3 style="color:var(--ink)">Saved recipes</h3>
+            <p style="color:var(--muted)">Build once, reuse forever. Most-used deck flows become one-click operations.</p>
+          </div>
+        </div>
+        <div class="d-item" style="border-color:var(--rule);border-bottom:none">
+          <div class="d-num" style="color:var(--o)">04</div>
+          <div class="d-body">
+            <h3 style="color:var(--ink)">Custom slide attachment</h3>
+            <p style="color:var(--muted)">Bespoke slides alongside master content — one unified, compliant deck.</p>
+          </div>
+        </div>
+      </div>
+      <div class="a3" style="border-top:1px solid var(--rule);padding-top:20px">
+        <div class="close-pills">
+          <span class="close-pill">Auto-compliance</span>
+          <span class="close-pill">Live master data</span>
+          <span class="close-pill">Custom recipes</span>
+          <span class="close-pill">One roof</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let cur=0,total=6;
+const dotsEl=document.getElementById('dots');
+for(let i=0;i<total;i++){
+  const d=document.createElement('button');
+  d.className='dot'+(i===0?' active':'');
+  d.setAttribute('aria-label','Slide '+(i+1));
+  d.onclick=()=>show(i);
+  dotsEl.appendChild(d);
+}
+function pad(n){return n<10?'0'+n:n}
+function show(n){
+  document.getElementById('s'+cur).classList.remove('active');
+  dotsEl.children[cur].classList.remove('active');
+  cur=n;
+  document.getElementById('s'+cur).classList.add('active');
+  dotsEl.children[cur].classList.add('active');
+  document.getElementById('prog').textContent=pad(cur+1)+' / '+pad(total);
+}
+</script>
+</body>
+</html>

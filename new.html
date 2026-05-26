@@ -1,0 +1,844 @@
+# DEXPERT — Hero Landing Page Redesign
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DEXPERT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --orange:#E8761A;
+  --orange-soft:#FEF3E8;
+  --orange-mid:#F6D1AF;
+  --bg:#FAF8F5;
+  --card:#FFFFFF;
+  --text:#171717;
+  --muted:#6F6F6F;
+  --border:#E9E4DD;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:'Barlow',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+.container{
+  width:min(1200px,92vw);
+  margin:auto;
+}
+
+nav{
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(18px);
+  background:rgba(250,248,245,0.8);
+  border-bottom:1px solid rgba(0,0,0,0.05);
+}
+
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:22px 0;
+}
+
+.logo{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:30px;
+  font-weight:700;
+  letter-spacing:0.5px;
+}
+
+.logo span{
+  color:var(--orange);
+}
+
+.nav-links{
+  display:flex;
+  gap:34px;
+}
+
+.nav-links a{
+  text-decoration:none;
+  color:#555;
+  font-size:14px;
+  font-weight:500;
+}
+
+.cta-btn{
+  background:var(--orange);
+  color:white;
+  border:none;
+  border-radius:999px;
+  padding:14px 22px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 10px 30px rgba(232,118,26,0.18);
+}
+
+.hero{
+  padding:80px 0 60px;
+  position:relative;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.1fr 0.9fr;
+  gap:60px;
+  align-items:center;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  background:var(--orange-soft);
+  border:1px solid var(--orange-mid);
+  color:var(--orange);
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:28px;
+}
+
+.hero h1{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:92px;
+  line-height:0.92;
+  letter-spacing:-2px;
+  margin-bottom:28px;
+}
+
+.hero h1 em{
+  color:var(--orange);
+  font-style:normal;
+}
+
+.hero-sub{
+  max-width:580px;
+  font-size:20px;
+  line-height:1.7;
+  color:var(--muted);
+  margin-bottom:38px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:16px;
+  margin-bottom:48px;
+}
+
+.secondary-btn{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:14px 22px;
+  font-weight:600;
+}
+
+.metric-row{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.metric{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:24px;
+  min-width:180px;
+}
+
+.metric h3{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:48px;
+  color:var(--orange);
+}
+
+.metric p{
+  color:#777;
+  font-size:14px;
+  margin-top:6px;
+  line-height:1.5;
+}
+
+.hero-visual{
+  position:relative;
+}
+
+.dashboard{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:32px;
+  padding:26px;
+  box-shadow:0 40px 80px rgba(0,0,0,0.06);
+  position:relative;
+  overflow:hidden;
+}
+
+.dashboard::before{
+  content:"";
+  position:absolute;
+  width:300px;
+  height:300px;
+  background:radial-gradient(circle, rgba(232,118,26,0.18), transparent 70%);
+  top:-120px;
+  right:-120px;
+}
+
+.dash-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+}
+
+.dash-pill{
+  background:var(--orange-soft);
+  color:var(--orange);
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.dash-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.dash-card{
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px;
+  background:#fff;
+}
+
+.dash-card.large{
+  grid-column:span 2;
+}
+
+.dash-label{
+  font-size:12px;
+  color:#888;
+  margin-bottom:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.bar{
+  height:10px;
+  background:#EFE9E2;
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+
+.bar span{
+  display:block;
+  height:100%;
+  background:var(--orange);
+  border-radius:999px;
+}
+
+.big-stat{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:54px;
+  color:var(--text);
+}
+
+section{
+  padding:110px 0;
+}
+
+.section-head{
+  margin-bottom:60px;
+}
+
+.section-head p{
+  color:var(--orange);
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:12px;
+}
+
+.section-head h2{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:64px;
+  line-height:0.98;
+  max-width:760px;
+}
+
+.problem-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:22px;
+}
+
+.problem-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:34px;
+  transition:0.25s ease;
+}
+
+.problem-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--orange-mid);
+}
+
+.problem-card h3{
+  font-size:22px;
+  margin-bottom:14px;
+}
+
+.problem-card p{
+  color:#666;
+  line-height:1.7;
+}
+
+.compare{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+
+.compare-card{
+  border-radius:30px;
+  padding:40px;
+}
+
+.compare-card.before{
+  background:#F1EEEA;
+}
+
+.compare-card.after{
+  background:linear-gradient(180deg,var(--orange-soft),#fff);
+  border:1px solid var(--orange-mid);
+}
+
+.compare-card h3{
+  font-size:28px;
+  margin-bottom:28px;
+}
+
+.compare-item{
+  display:flex;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.compare-item span{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  font-weight:700;
+}
+
+.before span{
+  background:#D7D0C8;
+  color:#666;
+}
+
+.after span{
+  background:var(--orange);
+  color:white;
+}
+
+.compare-item p{
+  color:#555;
+  line-height:1.6;
+}
+
+.workflow{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:18px;
+}
+
+.workflow-step{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:28px;
+  min-height:260px;
+  position:relative;
+}
+
+.workflow-num{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:52px;
+  color:var(--orange);
+  margin-bottom:20px;
+}
+
+.workflow-step h4{
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.workflow-step p{
+  color:#666;
+  line-height:1.6;
+  font-size:15px;
+}
+
+.value-strip{
+  background:var(--text);
+  color:white;
+  border-radius:40px;
+  padding:60px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+}
+
+.value-box h3{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:72px;
+  color:var(--orange);
+}
+
+.value-box p{
+  color:#C8C8C8;
+  margin-top:10px;
+  line-height:1.6;
+}
+
+.final-cta{
+  text-align:center;
+  padding-bottom:140px;
+}
+
+.final-cta h2{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:96px;
+  line-height:0.92;
+  margin-bottom:24px;
+}
+
+.final-cta h2 span{
+  color:var(--orange);
+}
+
+.final-cta p{
+  max-width:720px;
+  margin:auto;
+  color:#666;
+  font-size:20px;
+  line-height:1.8;
+  margin-bottom:40px;
+}
+
+.footer-tags{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.footer-tags div{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:12px 18px;
+  font-size:14px;
+  font-weight:600;
+}
+
+@media(max-width:1100px){
+  .hero-grid,
+  .compare,
+  .workflow,
+  .value-strip{
+    grid-template-columns:1fr;
+  }
+
+  .problem-grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero h1,
+  .final-cta h2{
+    font-size:68px;
+  }
+
+  .section-head h2{
+    font-size:48px;
+  }
+
+  .nav-links{
+    display:none;
+  }
+}
+
+@media(max-width:700px){
+  .hero{
+    padding-top:40px;
+  }
+
+  .hero h1,
+  .final-cta h2{
+    font-size:52px;
+  }
+
+  .section-head h2{
+    font-size:40px;
+  }
+
+  .hero-actions,
+  .metric-row{
+    flex-direction:column;
+  }
+
+  .value-strip{
+    padding:34px;
+  }
+
+  section{
+    padding:80px 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="container nav-inner">
+    <div class="logo">DE<span>></span>PERT</div>
+
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#impact">Impact</a>
+    </div>
+
+    <button class="cta-btn">Launch Deck Builder</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container hero-grid">
+
+    <div>
+      <div class="eyebrow">Intelligent presentation engine</div>
+
+      <h1>
+        Build decks in <em>seconds.</em><br>
+        Not hours.
+      </h1>
+
+      <p class="hero-sub">
+        DEXPERT pulls live data, legacy slides, compliance logic, and custom content into one streamlined workflow — so teams spend less time assembling decks and more time actually selling.
+      </p>
+
+      <div class="hero-actions">
+        <button class="cta-btn">Build a deck</button>
+        <button class="secondary-btn">See workflow</button>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric">
+          <h3>10×</h3>
+          <p>Faster presentation creation across recurring deck cycles.</p>
+        </div>
+
+        <div class="metric">
+          <h3>0</h3>
+          <p>Manual compliance back-and-forth required.</p>
+        </div>
+
+        <div class="metric">
+          <h3>1</h3>
+          <p>Unified source of truth for every team.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="dashboard">
+
+        <div class="dash-top">
+          <div>
+            <div class="dash-label">Deck Build Status</div>
+            <div class="big-stat">Ready to export</div>
+          </div>
+
+          <div class="dash-pill">Compliance Verified</div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="dash-label">Data Sync</div>
+            <div class="bar"><span style="width:92%"></span></div>
+            <p>Monthly data pulled from master source.</p>
+          </div>
+
+          <div class="dash-card">
+            <div class="dash-label">Disclaimer Engine</div>
+            <div class="bar"><span style="width:100%"></span></div>
+            <p>ISIN detection completed automatically.</p>
+          </div>
+
+          <div class="dash-card large">
+            <div class="dash-label">Slide Sources</div>
+            <div class="bar"><span style="width:84%"></span></div>
+            <p>
+              Legacy slides · Registration slides · Chapter slides · Custom team slides · Live performance data
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="problem">
+  <div class="container">
+
+    <div class="section-head">
+      <p>The Problem</p>
+      <h2>Every deck becomes a scavenger hunt.</h2>
+    </div>
+
+    <div class="problem-grid">
+
+      <div class="problem-card">
+        <h3>Fragmented sources</h3>
+        <p>
+          Monthly data lives in one system. Legacy decks somewhere else. Custom slides buried inside old folders and email threads.
+        </p>
+      </div>
+
+      <div class="problem-card">
+        <h3>Copy-paste workflows</h3>
+        <p>
+          Teams spend hours rebuilding presentations that already existed last month — just with slightly updated numbers.
+        </p>
+      </div>
+
+      <div class="problem-card">
+        <h3>Compliance bottlenecks</h3>
+        <p>
+          Disclaimer slides and ISIN checks are still handled manually, creating delays and unnecessary review loops.
+        </p>
+      </div>
+
+      <div class="problem-card">
+        <h3>Lost selling time</h3>
+        <p>
+          Sales and product teams spend more energy assembling decks than refining the actual investor narrative.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="container">
+
+    <div class="section-head">
+      <p>Before vs After</p>
+      <h2>Same deck. Completely different experience.</h2>
+    </div>
+
+    <div class="compare">
+
+      <div class="compare-card before">
+        <h3>Without DEXPERT</h3>
+
+        <div class="compare-item">
+          <span>×</span>
+          <p>Search through old decks to find the right slides.</p>
+        </div>
+
+        <div class="compare-item">
+          <span>×</span>
+          <p>Manually copy-paste performance, chapter, and registration slides.</p>
+        </div>
+
+        <div class="compare-item">
+          <span>×</span>
+          <p>Chase compliance teams for disclaimer approvals.</p>
+        </div>
+
+        <div class="compare-item">
+          <span>×</span>
+          <p>Reformat everything to match the latest template version.</p>
+        </div>
+      </div>
+
+      <div class="compare-card after">
+        <h3>With DEXPERT</h3>
+
+        <div class="compare-item">
+          <span>✓</span>
+          <p>Select a recipe or build a custom deck flow.</p>
+        </div>
+
+        <div class="compare-item">
+          <span>✓</span>
+          <p>Pull live data, legacy slides, and custom content in one flow.</p>
+        </div>
+
+        <div class="compare-item">
+          <span>✓</span>
+          <p>Auto-insert compliance slides through ISIN detection.</p>
+        </div>
+
+        <div class="compare-item">
+          <span>✓</span>
+          <p>Export a fully formatted, compliance-ready presentation instantly.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="container">
+
+    <div class="section-head">
+      <p>Workflow</p>
+      <h2>Five steps. One tool. Done.</h2>
+    </div>
+
+    <div class="workflow">
+
+      <div class="workflow-step">
+        <div class="workflow-num">01</div>
+        <h4>Choose a recipe</h4>
+        <p>Start from a saved investor deck workflow or create one from scratch.</p>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-num">02</div>
+        <h4>Assemble slides</h4>
+        <p>Pull slides from live data systems and the master archive.</p>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-num">03</div>
+        <h4>Add custom content</h4>
+        <p>Drop in your own team slides alongside master-controlled slides.</p>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-num">04</div>
+        <h4>Auto-compliance</h4>
+        <p>DEXPERT detects ISINs and appends required disclaimer slides automatically.</p>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-num">05</div>
+        <h4>Export instantly</h4>
+        <p>Download a polished deck ready for investors, sales, or internal use.</p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section id="impact">
+  <div class="container">
+
+    <div class="value-strip">
+
+      <div class="value-box">
+        <h3>~80%</h3>
+        <p>Reduction in presentation assembly time across recurring workflows.</p>
+      </div>
+
+      <div class="value-box">
+        <h3>0</h3>
+        <p>Manual compliance verification rounds required before export.</p>
+      </div>
+
+      <div class="value-box">
+        <h3>1</h3>
+        <p>Unified presentation ecosystem across sales, product, and compliance.</p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="container">
+
+    <h2>
+      Less time building.<br>
+      <span>More time selling.</span>
+    </h2>
+
+    <p>
+      DEXPERT doesn't change how teams work.
+      It removes the repetitive assembly layer that was never supposed to be manual in the first place.
+    </p>
+
+    <div class="footer-tags">
+      <div>Intelligent slide detection</div>
+      <div>Auto-compliance</div>
+      <div>Live master data</div>
+      <div>Custom recipes</div>
+      <div>One roof. Every slide.</div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
+```
+
+Key structural changes from your original file:
+
+* Removed all PPT-style slide navigation
+* Converted to continuous landing-page flow
+* Added modern hero section with dashboard-style visual
+* Increased whitespace and hierarchy dramatically
+* Reworked cards to feel more SaaS/product-oriented
+* Removed “Slide X of Y” framing entirely
+* Added responsive behavior
+* Kept your palette, typography, and almost all messaging intact
+* Shifted from “presentation narrative” to “product positioning”
