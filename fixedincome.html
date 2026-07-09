@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xtrackers Fixed Income — The Toolkit, Organised by the Job at Hand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,440;9..144,560;9..144,650;9..144,720&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1EEE6;
+    --paper-alt:#E8E1CF;
+    --card:#FBF9F3;
+    --ink:#211E19;
+    --ink-soft:#4B463D;
+    --slate:#6C675C;
+    --line:#D9D1BC;
+    --rust:#BD4A1D;
+    --rust-deep:#8F3712;
+    --rust-bright:#E27A3F;
+    --brass:#8C6A3B;
+    --brass-light:#C9A468;
+    --ink-bg:#211E19;
+    --ink-bg-2:#2A251E;
+    --on-ink:#F1EBDD;
+    --on-ink-soft:#C9C0AC;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation:none !important; transition:none !important;}
+  }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  html{ scroll-snap-type:y proximity; }
+  main{ scroll-snap-type:y proximity; }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; margin:0; font-weight:650; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ color:inherit; text-decoration:none; }
+  .mono{ font-family:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; }
+
+  /* ---------- layout shells ---------- */
+  .slide{
+    position:relative;
+    min-height:100svh;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:6.5rem clamp(1.25rem,5.5vw,5rem) 4.5rem;
+    scroll-snap-align:start;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .slide.dark{ background:var(--ink-bg); color:var(--on-ink); border-bottom:1px solid #3a342a; }
+  .slide.alt{ background:var(--paper-alt); }
+  .slide__inner{ max-width:1180px; margin:0 auto; width:100%; position:relative; z-index:2; }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    font-size:.72rem;
+    color:var(--rust-deep);
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    margin-bottom:1.1rem;
+  }
+  .dark .eyebrow{ color:var(--rust-bright); }
+  .eyebrow::before{ content:""; width:22px; height:1px; background:currentColor; display:inline-block; }
+
+  .display--xl{ font-size:clamp(2.5rem, 5.6vw, 5rem); line-height:1.03; }
+  .display--lg{ font-size:clamp(2rem, 4.2vw, 3.35rem); line-height:1.06; }
+  .display--md{ font-size:clamp(1.5rem, 2.6vw, 2.1rem); line-height:1.14; }
+
+  .lede{ font-size:clamp(1.05rem,1.6vw,1.28rem); color:var(--ink-soft); max-width:640px; line-height:1.55; margin-top:1.3rem; }
+  .dark .lede{ color:var(--on-ink-soft); }
+  .body-text{ font-size:1rem; line-height:1.7; color:var(--slate); max-width:56ch; }
+  .dark .body-text{ color:var(--on-ink-soft); }
+
+  .reveal{ opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease; }
+  .slide.in-view .reveal{ opacity:1; transform:none; }
+
+  /* ---------- top bar + nav ---------- */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:80;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.85rem clamp(1rem,4vw,2.6rem);
+    background:rgba(241,238,230,.86);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
+  }
+  .topbar__mark span{ color:var(--slate); font-weight:400; margin-left:.4em; }
+  .topbar__count{ color:var(--rust-deep); font-weight:600; }
+
+  .dot-nav{
+    position:fixed; right:24px; top:50%; transform:translateY(-50%); z-index:80;
+    display:flex; flex-direction:column; gap:13px;
+  }
+  .dot-nav a{
+    width:9px; height:9px; border-radius:50%;
+    background:transparent; border:1.4px solid var(--brass);
+    display:block; position:relative; transition:all .25s ease;
+  }
+  .dot-nav a.active{ background:var(--rust); border-color:var(--rust); transform:scale(1.5); }
+  .dot-nav a:hover::after{
+    content:attr(data-label);
+    position:absolute; right:20px; top:50%; transform:translateY(-50%);
+    background:var(--ink); color:var(--on-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; letter-spacing:.06em; text-transform:uppercase;
+    padding:.3rem .55rem; border-radius:3px; white-space:nowrap; pointer-events:none;
+  }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--rust); outline-offset:3px; border-radius:2px; }
+  @media (max-width:760px){ .dot-nav{ display:none; } }
+
+  /* ---------- texture ---------- */
+  .grain{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+    background-image: radial-gradient(circle, rgba(140,106,59,.16) 1px, transparent 1px);
+    background-size:22px 22px; }
+  .dark .grain{ opacity:.14; background-image: radial-gradient(circle, rgba(226,122,63,.5) 1px, transparent 1px); }
+
+  .rosette{ position:absolute; width:220px; height:220px; border-radius:50%; z-index:0; pointer-events:none; }
+  .rosette svg{ width:100%; height:100%; }
+
+  /* ---------- cover ---------- */
+  .cover{ align-items:stretch; }
+  .cover__grid{ display:grid; grid-template-columns:1.2fr .8fr; gap:3rem; align-items:center; }
+  .cover .wordmark{ font-family:'IBM Plex Mono',monospace; letter-spacing:.2em; font-size:.78rem; text-transform:uppercase; color:var(--on-ink-soft); margin-bottom:2.2rem; }
+  .cover h1{ color:var(--on-ink); }
+  .cover .lede{ color:var(--on-ink-soft); }
+  .scroll-cue{ margin-top:3rem; display:flex; align-items:center; gap:.6rem; font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--on-ink-soft); }
+  .scroll-cue__line{ width:26px; height:1px; background:var(--rust-bright); animation:pulse-line 1.8s ease-in-out infinite; }
+  @keyframes pulse-line{ 0%,100%{opacity:.35;width:26px;} 50%{opacity:1;width:44px;} }
+
+  .cover-ticket{
+    border:1px solid #443c2e; background:var(--ink-bg-2); border-radius:8px; padding:1.6rem;
+    display:flex; flex-direction:column; gap:1rem; position:relative;
+  }
+  .cover-ticket__row{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px dashed #4a4230; padding-bottom:.8rem; }
+  .cover-ticket__row:last-of-type{ border-bottom:none; padding-bottom:0; }
+  .cover-ticket__ticker{ font-family:'IBM Plex Mono',monospace; font-size:1.5rem; color:var(--rust-bright); font-weight:600; }
+  .cover-ticket__label{ font-family:'IBM Plex Mono',monospace; font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--on-ink-soft); text-align:right; }
+  .cover-ticket__name{ font-family:'Fraunces',serif; font-size:1rem; color:var(--on-ink); }
+  .cover-ticket__foot{ font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--on-ink-soft); display:flex; justify-content:space-between; }
+
+  /* ---------- thesis scatter ---------- */
+  .thesis__grid{ display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+  .scatter-wrap{ width:100%; aspect-ratio:1.25/1; }
+  .scatter-wrap svg{ width:100%; height:100%; }
+  .scatter-dot{ fill:var(--brass); opacity:.55; }
+  .scatter-node{ fill:var(--card); stroke:var(--rust); stroke-width:1.6; }
+  .scatter-label{ font-family:'IBM Plex Mono',monospace; font-size:8.5px; fill:var(--ink); text-transform:uppercase; letter-spacing:.03em; }
+  .scatter-line{ stroke:var(--brass); stroke-width:.6; opacity:.4; }
+
+  /* ---------- framework map ---------- */
+  .map-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:1.1rem; margin-top:2.6rem; }
+  .job-card{
+    border:1px solid var(--line); background:var(--card); border-radius:8px;
+    padding:1.4rem 1.15rem 1.6rem; display:flex; flex-direction:column; gap:.85rem;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .job-card:hover{ transform:translateY(-5px); border-color:var(--rust); box-shadow:0 10px 24px -12px rgba(189,74,29,.35); }
+  .job-card__num{ font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--slate); }
+  .job-card__icon{ width:30px; height:30px; color:var(--rust); }
+  .job-card__icon svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+  .job-card__title{ font-family:'Fraunces',serif; font-size:1.05rem; font-weight:650; }
+  .job-card__desc{ font-size:.85rem; color:var(--slate); line-height:1.5; }
+  .job-card__go{ margin-top:auto; font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--rust-deep); }
+  @media (max-width:980px){ .map-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .map-grid{ grid-template-columns:1fr; } }
+
+  /* ---------- bucket slides ---------- */
+  .bucket__grid{ display:grid; grid-template-columns:.92fr 1.08fr; gap:3.2rem; align-items:start; margin-top:1rem; }
+  .job-quote{
+    margin-top:1.6rem; padding-left:1.15rem; border-left:2px solid var(--rust);
+    font-family:'Fraunces',serif; font-style:italic; font-size:1.18rem; line-height:1.5; color:var(--ink);
+    max-width:52ch;
+  }
+  .dark .job-quote{ color:var(--on-ink); border-left-color:var(--rust-bright); }
+  .risk-note{
+    margin-top:1.6rem; padding:.9rem 1.05rem; border:1px dashed var(--brass); border-radius:6px;
+    font-size:.82rem; color:var(--ink-soft); line-height:1.55; background:rgba(140,106,59,.08);
+  }
+  .dark .risk-note{ color:var(--on-ink-soft); border-color:var(--brass-light); background:rgba(201,164,104,.08); }
+
+  .tickets{ display:flex; flex-direction:column; gap:1.1rem; }
+  .ticket{
+    display:flex; border:1px solid var(--line); background:var(--card); border-radius:7px; overflow:hidden;
+    transition:box-shadow .25s ease, transform .25s ease;
+  }
+  .ticket:hover{ box-shadow:0 14px 28px -16px rgba(33,30,25,.35); transform:translateY(-3px); }
+  .dark .ticket{ background:var(--ink-bg-2); border-color:#443c2e; }
+  .ticket__stub{
+    flex:0 0 132px; width:132px; background:var(--paper-alt); border-right:2px dashed var(--brass);
+    padding:1.15rem .9rem; display:flex; flex-direction:column; justify-content:center; gap:.3rem; position:relative;
+  }
+  .dark .ticket__stub{ background:#241f18; border-right-color:var(--brass-light); }
+  .ticket__stub::before, .ticket__stub::after{
+    content:""; position:absolute; right:-9px; width:16px; height:16px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--line);
+  }
+  .dark .ticket__stub::before, .dark .ticket__stub::after{ background:var(--ink-bg); border-color:#443c2e; }
+  .ticket__stub::before{ top:-9px; } .ticket__stub::after{ bottom:-9px; }
+  .ticket__ticker{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:1.4rem; color:var(--rust-deep); letter-spacing:.01em; }
+  .dark .ticket__ticker{ color:var(--rust-bright); }
+  .ticket__ter{ font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:var(--slate); }
+  .dark .ticket__ter{ color:var(--on-ink-soft); }
+  .ticket__body{ flex:1; padding:1.15rem 1.4rem; display:flex; flex-direction:column; gap:.55rem; min-width:0; }
+  .ticket__name{ font-family:'Fraunces',serif; font-weight:650; font-size:1.05rem; line-height:1.3; }
+  .ticket__meta{ display:flex; flex-wrap:wrap; gap:.35rem 1.3rem; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:var(--slate); }
+  .dark .ticket__meta{ color:var(--on-ink-soft); }
+  .ticket__meta b{ color:var(--ink); font-weight:600; }
+  .dark .ticket__meta b{ color:var(--on-ink); }
+  @media (max-width:520px){
+    .ticket{ flex-direction:column; }
+    .ticket__stub{ width:100%; flex:none; border-right:none; border-bottom:2px dashed var(--brass); flex-direction:row; justify-content:space-between; align-items:center; }
+    .ticket__stub::before,.ticket__stub::after{ top:auto; bottom:-9px; }
+    .ticket__stub::before{ left:16px; right:auto; }
+    .ticket__stub::after{ right:16px; }
+  }
+  @media (max-width:900px){ .bucket__grid{ grid-template-columns:1fr; gap:2rem; } }
+  @media (max-width:860px){
+    .cover__grid{ grid-template-columns:1fr; gap:2.4rem; }
+    .thesis__grid{ grid-template-columns:1fr; gap:2rem; }
+    .scatter-wrap{ max-width:340px; margin:0 auto; }
+    .slide{ padding-top:5.5rem; }
+  }
+
+  /* ---------- ladder ---------- */
+  .ladder{ display:flex; align-items:flex-end; gap:1.4rem; margin-top:1rem; padding-top:2rem; }
+  .rung{ flex:1; display:flex; flex-direction:column; align-items:center; gap:.8rem; }
+  .rung__card{
+    width:100%; border:1px solid #443c2e; background:var(--ink-bg-2); border-radius:6px;
+    padding:.75rem .6rem; text-align:center; display:flex; flex-direction:column; gap:.3rem;
+  }
+  .rung__year{ font-family:'Fraunces',serif; font-size:1.05rem; color:var(--on-ink); font-weight:650; }
+  .rung__ticker{ font-family:'IBM Plex Mono',monospace; color:var(--rust-bright); font-size:.85rem; }
+  .rung__ter{ font-family:'IBM Plex Mono',monospace; color:var(--on-ink-soft); font-size:.66rem; }
+  .rung__bar{ width:64%; border-radius:3px 3px 0 0; background:linear-gradient(180deg, var(--rust-bright), var(--rust-deep)); }
+  .rung:nth-child(1) .rung__bar{ height:44px; }
+  .rung:nth-child(2) .rung__bar{ height:74px; }
+  .rung:nth-child(3) .rung__bar{ height:104px; }
+  .rung:nth-child(4) .rung__bar{ height:134px; }
+  .ladder-axis{ border-top:1px solid #443c2e; margin-top:.3rem; padding-top:.5rem; display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--on-ink-soft); text-transform:uppercase; letter-spacing:.06em; }
+  @media (max-width:760px){ .ladder{ flex-direction:column; align-items:stretch; } .rung__bar{ display:none; } }
+
+  /* ---------- table slide ---------- */
+  .table-wrap{ overflow-x:auto; margin-top:2rem; border:1px solid var(--line); border-radius:8px; }
+  table{ border-collapse:collapse; width:100%; min-width:760px; background:var(--card); }
+  thead th{
+    text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--on-ink); background:var(--ink-bg); padding:.85rem 1rem; white-space:nowrap;
+  }
+  tbody td{ padding:.8rem 1rem; border-top:1px solid var(--line); font-size:.87rem; color:var(--ink-soft); vertical-align:top; }
+  tbody tr:hover{ background:var(--paper-alt); }
+  td.job{ font-family:'IBM Plex Mono',monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--rust-deep); white-space:nowrap; }
+  td.ticker{ font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink); white-space:nowrap; }
+  td.isin{ font-family:'IBM Plex Mono',monospace; font-size:.78rem; color:var(--slate); white-space:nowrap; }
+  td.ter{ font-family:'IBM Plex Mono',monospace; white-space:nowrap; color:var(--ink); }
+  .table-foot{ margin-top:1rem; font-size:.78rem; color:var(--slate); max-width:70ch; line-height:1.6; }
+
+  /* ---------- closing ---------- */
+  .closing .lede{ max-width:560px; }
+  .cta-row{ display:flex; flex-wrap:wrap; gap:1rem; margin-top:2.2rem; align-items:center; }
+  .cta-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+    border:1px solid var(--rust-bright); color:var(--on-ink); padding:.85rem 1.4rem; border-radius:4px;
+    display:inline-flex; align-items:center; gap:.5rem; transition:background .25s ease, color .25s ease;
+  }
+  .cta-btn:hover{ background:var(--rust-bright); color:var(--ink-bg); }
+  .disclaimer{
+    margin-top:3.4rem; padding-top:1.6rem; border-top:1px solid #443c2e;
+    font-size:.74rem; line-height:1.7; color:var(--on-ink-soft); max-width:840px;
+  }
+  .footer-mark{ margin-top:2rem; font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--brass-light); }
+
+  /* icons reused */
+  .icon{ width:20px; height:20px; }
+  .icon svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar__mark">XTRACKERS<span>by DWS · Fixed Income</span></span>
+  <span class="topbar__count"><span id="curSlide">01</span> / 10</span>
+</header>
+
+<nav class="dot-nav" aria-label="Slide navigation">
+  <a href="#s1" data-label="Cover" class="active"></a>
+  <a href="#s2" data-label="Why goals"></a>
+  <a href="#s3" data-label="The range"></a>
+  <a href="#s4" data-label="Anchor the core"></a>
+  <a href="#s5" data-label="Generate income"></a>
+  <a href="#s6" data-label="Reach beyond core"></a>
+  <a href="#s7" data-label="Target a maturity"></a>
+  <a href="#s8" data-label="Manage cash"></a>
+  <a href="#s9" data-label="Full toolkit"></a>
+  <a href="#s10" data-label="Next step"></a>
+</nav>
+
+<main>
+
+  <!-- 01 COVER -->
+  <section id="s1" class="slide dark cover" data-index="01">
+    <div class="grain"></div>
+    <div class="rosette" style="top:-60px; right:-60px; opacity:.5;">
+      <svg viewBox="0 0 200 200"><g fill="none" stroke="#C9A468" stroke-width="0.6" opacity="0.6">
+        <circle cx="100" cy="100" r="40" stroke-dasharray="2 4"/>
+        <circle cx="100" cy="100" r="60" stroke-dasharray="2 4"/>
+        <circle cx="100" cy="100" r="80" stroke-dasharray="1 5"/>
+        <circle cx="100" cy="100" r="96"/>
+      </g></svg>
+    </div>
+    <div class="slide__inner cover__grid">
+      <div class="reveal">
+        <div class="wordmark">Xtrackers by DWS &nbsp;·&nbsp; Fixed Income Range &nbsp;·&nbsp; For professional investors</div>
+        <h1 class="display--xl">The fixed&#8209;income toolkit,<br>organised by the job<br>at hand.</h1>
+        <p class="lede">Five investor goals. A named Xtrackers ETF for each one. One rate cycle to navigate together — starting at <span class="mono">etf.dws.com/en&#8209;gb</span>.</p>
+        <div class="scroll-cue"><span class="scroll-cue__line"></span> Scroll to begin</div>
+      </div>
+      <div class="reveal" style="transition-delay:.15s">
+        <div class="cover-ticket">
+          <div class="cover-ticket__row">
+            <div><div class="cover-ticket__ticker">XM29</div><div class="cover-ticket__name">Target Maturity Sept 2029 EUR Corporate Bond</div></div>
+            <div class="cover-ticket__label">TER<br>0.12%</div>
+          </div>
+          <div class="cover-ticket__row">
+            <div><div class="cover-ticket__ticker">XBLC</div><div class="cover-ticket__name">EUR Corporate Bond UCITS ETF</div></div>
+            <div class="cover-ticket__label">TER<br>0.09%</div>
+          </div>
+          <div class="cover-ticket__row">
+            <div><div class="cover-ticket__ticker">XEON</div><div class="cover-ticket__name">EUR Overnight Rate Swap UCITS ETF</div></div>
+            <div class="cover-ticket__label">TER<br>0.10%</div>
+          </div>
+          <div class="cover-ticket__foot"><span>Sample from the range</span><span>ISIN‑verified below ↓</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 THESIS -->
+  <section id="s2" class="slide" data-index="02">
+    <div class="slide__inner thesis__grid">
+      <div class="reveal">
+        <div class="eyebrow">Why goals, not labels</div>
+        <h2 class="display--lg">Nobody allocates to an&nbsp;"asset class." They allocate to a job that needs doing.</h2>
+        <p class="body-text" style="margin-top:1.4rem;">The bond market lists tens of thousands of individual securities across currencies, coupons, credit tiers and maturities. An advisor doesn't need another taxonomy chart for that — they need one clear answer: which building block does which job in a client's book? Ballast. Income. Extra return. A fixed date. Somewhere to park cash before the next decision.</p>
+        <p class="body-text" style="margin-top:1rem;">That's how the Xtrackers fixed income range is organised on the pages that follow.</p>
+      </div>
+      <div class="reveal scatter-wrap" style="transition-delay:.15s" aria-hidden="true">
+        <svg viewBox="0 0 420 340" id="scatterSvg"></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 MAP -->
+  <section id="s3" class="slide alt" data-index="03">
+    <div class="slide__inner">
+      <div class="reveal">
+        <div class="eyebrow">The range at a glance</div>
+        <h2 class="display--lg">Five jobs, five ETF families.</h2>
+        <p class="lede">Jump straight to the one your client needs.</p>
+      </div>
+      <div class="map-grid reveal" style="transition-delay:.12s">
+        <a class="job-card" href="#s4">
+          <span class="job-card__num mono">01</span>
+          <span class="job-card__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.1"/><path d="M12 7.1V21M7 21h10M4 12a8 8 0 0 0 8 8 8 8 0 0 0 8-8M4 12h3M17 12h3"/></svg></span>
+          <span class="job-card__title">Anchor the Core</span>
+          <span class="job-card__desc">Diversified sovereign ballast for the base of the book.</span>
+          <span class="job-card__go">See the funds →</span>
+        </a>
+        <a class="job-card" href="#s5">
+          <span class="job-card__num mono">02</span>
+          <span class="job-card__icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v5c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 11v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/></svg></span>
+          <span class="job-card__title">Generate Income</span>
+          <span class="job-card__desc">Quarterly cash flow from investment‑grade credit.</span>
+          <span class="job-card__go">See the funds →</span>
+        </a>
+        <a class="job-card" href="#s6">
+          <span class="job-card__num mono">03</span>
+          <span class="job-card__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z"/></svg></span>
+          <span class="job-card__title">Reach Beyond Core</span>
+          <span class="job-card__desc">Extra yield from high yield and EM debt — extra risk too.</span>
+          <span class="job-card__go">See the funds →</span>
+        </a>
+        <a class="job-card" href="#s7">
+          <span class="job-card__num mono">04</span>
+          <span class="job-card__icon"><svg viewBox="0 0 24 24"><path d="M6 2v20M18 2v20M6 7h12M6 12h12M6 17h12"/></svg></span>
+          <span class="job-card__title">Target a Maturity</span>
+          <span class="job-card__desc">A fixed redemption date, wrapped in a diversified fund.</span>
+          <span class="job-card__go">See the funds →</span>
+        </a>
+        <a class="job-card" href="#s8">
+          <span class="job-card__num mono">05</span>
+          <span class="job-card__icon"><svg viewBox="0 0 24 24"><path d="M12 2s7 8.5 7 13a7 7 0 1 1-14 0c0-4.5 7-13 7-13Z"/></svg></span>
+          <span class="job-card__title">Manage Cash &amp; Liquidity</span>
+          <span class="job-card__desc">Keep dry powder productive while you decide the next move.</span>
+          <span class="job-card__go">See the funds →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 CORE -->
+  <section id="s4" class="slide" data-index="04">
+    <div class="slide__inner">
+      <div class="bucket__grid">
+        <div class="reveal">
+          <div class="eyebrow">Job 01 — Stability</div>
+          <h2 class="display--md">Anchor the Core</h2>
+          <p class="job-quote">"I need the ballast that holds steady when equities don't."</p>
+          <p class="body-text" style="margin-top:1.2rem;">Diversified, investment‑grade sovereign exposure across the full yield curve — liquid, low‑cost, and built to be the quiet foundation underneath everything else in the sleeve.</p>
+        </div>
+        <div class="reveal tickets" style="transition-delay:.12s">
+          <div class="ticket">
+            <div class="ticket__stub"><div class="ticket__ticker">XGLE</div><div class="ticket__ter">TER 0.07%</div></div>
+            <div class="ticket__body">
+              <div class="ticket__name">Xtrackers II Eurozone Government Bond UCITS ETF</div>
+              <div class="ticket__meta">
+                <span>ISIN <b>LU0290355717</b></span>
+                <span>Tracks <b>iBoxx® EUR Sovereigns Eurozone</b></span>
+                <span>AUM <b>~€2.2bn</b></span>
+                <span>Since <b>2007</b></span>
+              </div>
+            </div>
+          </div>
+          <div class="ticket">
+            <div class="ticket__stub"><div class="ticket__ticker">XGSH</div><div class="ticket__ter">TER 0.25%</div></div>
+            <div class="ticket__body">
+              <div class="ticket__name">Xtrackers II Global Government Bond UCITS ETF — EUR Hedged</div>
+              <div class="ticket__meta">
+                <span>ISIN <b>LU0378818131</b></span>
+                <span>Tracks <b>FTSE WGBI Developed Markets (EUR Hdg)</b></span>
+                <span>AUM <b>~€0.7bn</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 INCOME -->
+  <section id="s5" class="slide alt" data-index="05">
+    <div class="slide__inner">
+      <div class="bucket__grid">
+        <div class="reveal">
+          <div class="eyebrow">Job 02 — Income</div>
+          <h2 class="display--md">Generate Income</h2>
+          <p class="job-quote">"I need dependable, quarterly cash flow — without stepping down the credit ladder."</p>
+          <p class="body-text" style="margin-top:1.2rem;">EUR investment‑grade corporate credit from industrial, utility and financial issuers, in both accumulating and quarterly‑distributing share classes — for clients who want coupon‑like income from a single ticket.</p>
+        </div>
+        <div class="reveal tickets" style="transition-delay:.12s">
+          <div class="ticket">
+            <div class="ticket__stub"><div class="ticket__ticker">XBLC</div><div class="ticket__ter">TER 0.09%</div></div>
+            <div class="ticket__body">
+              <div class="ticket__name">Xtrackers II EUR Corporate Bond UCITS ETF</div>
+              <div class="ticket__meta">
+                <span>ISIN <b>LU0478205379</b></span>
+                <span>Tracks <b>Bloomberg Euro Corporate Bond Index</b></span>
+                <span>AUM <b>~€4.4bn</b></span>
+                <span>Since <b>2010</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 BEYOND CORE -->
+  <section id="s6" class="slide" data-index="06">
+    <div class="slide__inner">
+      <div class="bucket__grid">
+        <div class="reveal">
+          <div class="eyebrow">Job 03 — Extra return</div>
+          <h2 class="display--md">Reach Beyond Core</h2>
+          <p class="job-quote">"I need extra yield, and my client can carry the credit and currency risk that comes with it."</p>
+          <p class="body-text" style="margin-top:1.2rem;">Sub‑investment‑grade EUR credit and USD emerging‑market sovereign debt sit outside the core deliberately — they're the sleeve you reach for once ballast and income are already covered.</p>
+          <div class="risk-note">Higher‑yielding by design: high‑yield and EM sovereign debt carry materially greater credit, liquidity and (for unhedged share classes) currency risk than government or investment‑grade credit.</div>
+        </div>
+        <div class="reveal tickets" style="transition-delay:.12s">
+          <div class="ticket">
+            <div class="ticket__stub"><div class="ticket__ticker">XHYG</div><div class="ticket__ter">TER 0.20%</div></div>
+            <div class="ticket__body">
+              <div class="ticket__name">Xtrackers EUR High Yield Corporate Bond UCITS ETF</div>
+              <div class="ticket__meta">
+                <span>ISIN <b>LU1109942653</b></span>
+                <span>Tracks <b>iBoxx® EUR Liquid High Yield</b></span>
+                <span>AUM <b>~€1.1bn</b></span>
+              </div>
+            </div>
+          </div>
+          <div class="ticket">
+            <div class="ticket__stub"><div class="ticket__ticker">XEMB</div><div class="ticket__ter">TER 0.40%</div></div>
+            <div class="ticket__body">
+              <div class="ticket__name">Xtrackers II J.P. Morgan USD Emerging Markets Bond UCITS ETF — EUR Hedged</div>
+              <div class="ticket__meta">
+                <span>ISIN <b>LU0321462953</b></span>
+                <span>Tracks <b>JPM EMBI Global Diversified 1Bn (EUR Hdg)</b></span>
+                <span>AUM <b>~€0.2bn</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 TARGET MATURITY — HERO -->
+  <section id="s7" class="slide dark" data-index="07">
+    <div class="grain"></div>
+    <div class="slide__inner">
+      <div class="bucket__grid" style="align-items:center;">
+        <div class="reveal">
+          <div class="eyebrow">Job 04 — A known date</div>
+          <h2 class="display--md">Target a Maturity</h2>
+          <p class="job-quote">"I need to know exactly when this money comes back — like holding a single bond, without losing the diversification of a fund."</p>
+          <p class="body-text" style="margin-top:1.2rem;">Each Target Maturity ETF holds a diversified, ESG‑screened basket of EUR investment‑grade corporate bonds maturing in the same twelve‑month window. Quarterly coupons flow through as they're collected; capital returns at the stated date, then the fund closes — four rungs an advisor can combine into a laddered portfolio with staggered redemption dates.</p>
+        </div>
+        <div class="reveal" style="transition-delay:.12s">
+          <div class="ladder">
+            <div class="rung"><div class="rung__bar"></div><div class="rung__card"><div class="rung__year">Sept 2027</div><div class="rung__ticker">XM27</div><div class="rung__ter">TER 0.12%</div></div></div>
+            <div class="rung"><div class="rung__bar"></div><div class="rung__card"><div class="rung__year">Sept 2029</div><div class="rung__ticker">XM29</div><div class="rung__ter">TER 0.12%</div></div></div>
+            <div class="rung"><div class="rung__bar"></div><div class="rung__card"><div class="rung__year">Sept 2031</div><div class="rung__ticker">XB31</div><div class="rung__ter">TER 0.12%</div></div></div>
+            <div class="rung"><div class="rung__bar"></div><div class="rung__card"><div class="rung__year">Sept 2033</div><div class="rung__ticker">XM33</div><div class="rung__ter">TER 0.12%</div></div></div>
+          </div>
+          <div class="ladder-axis"><span>Nearer‑dated</span><span>Bloomberg MSCI Euro Corporate SRI, per maturity year</span><span>Further‑dated</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 CASH -->
+  <section id="s8" class="slide alt" data-index="08">
+    <div class="slide__inner">
+      <div class="bucket__grid">
+        <div class="reveal">
+          <div class="eyebrow">Job 05 — Liquidity</div>
+          <h2 class="display--md">Manage Cash &amp; Liquidity</h2>
+          <p class="job-quote">"I need cash sitting productively — not idle — while I decide the next move."</p>
+          <p class="body-text" style="margin-top:1.2rem;">A pure liquidity‑management tool: exposure to the euro short‑term rate, reinvested daily, traded like a share intraday. The scale below is the market's own vote of confidence in it as a cash‑parking instrument.</p>
+        </div>
+        <div class="reveal tickets" style="transition-delay:.12s">
+          <div class="ticket">
+            <div class="ticket__stub"><div class="ticket__ticker">XEON</div><div class="ticket__ter">TER 0.10%</div></div>
+            <div class="ticket__body">
+              <div class="ticket__name">Xtrackers II EUR Overnight Rate Swap UCITS ETF</div>
+              <div class="ticket__meta">
+                <span>ISIN <b>LU0290358497</b></span>
+                <span>Tracks <b>Solactive €STR +8.5 Daily</b></span>
+                <span>AUM <b>~€21.4bn</b></span>
+                <span>One of Europe's largest cash‑management ETFs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 TABLE -->
+  <section id="s9" class="slide" data-index="09">
+    <div class="slide__inner">
+      <div class="reveal">
+        <div class="eyebrow">The full toolkit</div>
+        <h2 class="display--lg">One page, five jobs, ten tickers.</h2>
+      </div>
+      <div class="reveal table-wrap" style="transition-delay:.12s">
+        <table>
+          <thead><tr><th>Job</th><th>Fund</th><th>Ticker</th><th>ISIN</th><th>TER</th><th>Tracks</th></tr></thead>
+          <tbody>
+            <tr><td class="job">Core</td><td>Eurozone Government Bond UCITS ETF</td><td class="ticker">XGLE</td><td class="isin">LU0290355717</td><td class="ter">0.07%</td><td>iBoxx® EUR Sovereigns Eurozone</td></tr>
+            <tr><td class="job">Core</td><td>Global Government Bond UCITS ETF (EUR Hdg)</td><td class="ticker">XGSH</td><td class="isin">LU0378818131</td><td class="ter">0.25%</td><td>FTSE WGBI Developed Markets (EUR Hdg)</td></tr>
+            <tr><td class="job">Income</td><td>EUR Corporate Bond UCITS ETF</td><td class="ticker">XBLC</td><td class="isin">LU0478205379</td><td class="ter">0.09%</td><td>Bloomberg Euro Corporate Bond Index</td></tr>
+            <tr><td class="job">Beyond Core</td><td>EUR High Yield Corporate Bond UCITS ETF</td><td class="ticker">XHYG</td><td class="isin">LU1109942653</td><td class="ter">0.20%</td><td>iBoxx® EUR Liquid High Yield</td></tr>
+            <tr><td class="job">Beyond Core</td><td>J.P. Morgan USD EM Bond UCITS ETF (EUR Hdg)</td><td class="ticker">XEMB</td><td class="isin">LU0321462953</td><td class="ter">0.40%</td><td>JPM EMBI Global Diversified (EUR Hdg)</td></tr>
+            <tr><td class="job">Target Maturity</td><td>Target Maturity Sept 2027 EUR Corporate Bond</td><td class="ticker">XM27</td><td class="isin">LU2673522830</td><td class="ter">0.12%</td><td>Bloomberg MSCI Euro Corporate Sept 2027 SRI</td></tr>
+            <tr><td class="job">Target Maturity</td><td>Target Maturity Sept 2029 EUR Corporate Bond</td><td class="ticker">XM29</td><td class="isin">LU2673522913</td><td class="ter">0.12%</td><td>Bloomberg MSCI Euro Corporate Sept 2029 SRI</td></tr>
+            <tr><td class="job">Target Maturity</td><td>Target Maturity Sept 2031 EUR Corporate Bond</td><td class="ticker">XB31</td><td class="isin">LU2673523481</td><td class="ter">0.12%</td><td>Bloomberg MSCI Euro Corporate Sept 2031 SRI</td></tr>
+            <tr><td class="job">Target Maturity</td><td>Target Maturity Sept 2033 EUR Corporate Bond</td><td class="ticker">XM33</td><td class="isin">LU2673523051</td><td class="ter">0.12%</td><td>Bloomberg MSCI Euro Corporate Sept 2033 SRI</td></tr>
+            <tr><td class="job">Cash</td><td>EUR Overnight Rate Swap UCITS ETF</td><td class="ticker">XEON</td><td class="isin">LU0290358497</td><td class="ter">0.10%</td><td>Solactive €STR +8.5 Daily</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-foot reveal" style="transition-delay:.2s">Most funds above are also available in alternate accumulating (1C) or distributing (1D) share classes under separate ISINs. AUM, TER and ISIN figures are indicative, drawn from third‑party fund data as of mid‑2026 — confirm against the live KIID/factsheet at etf.dws.com before use with a client.</p>
+    </div>
+  </section>
+
+  <!-- 10 CLOSE -->
+  <section id="s10" class="slide dark closing" data-index="10">
+    <div class="grain"></div>
+    <div class="rosette" style="bottom:-70px; left:-70px; opacity:.4;">
+      <svg viewBox="0 0 200 200"><g fill="none" stroke="#C9A468" stroke-width="0.6" opacity="0.6">
+        <circle cx="100" cy="100" r="40" stroke-dasharray="2 4"/>
+        <circle cx="100" cy="100" r="60" stroke-dasharray="2 4"/>
+        <circle cx="100" cy="100" r="80" stroke-dasharray="1 5"/>
+      </g></svg>
+    </div>
+    <div class="slide__inner">
+      <div class="reveal">
+        <div class="eyebrow">Next step</div>
+        <h2 class="display--xl">Which job is your allocation doing today?</h2>
+        <p class="lede">Explore live pricing, factsheets and KIIDs for the full Xtrackers fixed income range.</p>
+        <div class="cta-row">
+          <a class="cta-btn" href="https://etf.dws.com/en-gb/" target="_blank" rel="noopener">etf.dws.com/en‑gb ↗</a>
+        </div>
+        <div class="disclaimer">
+          For professional / institutional investors only. This is an illustrative marketing overview, not investment advice, an offer, or a solicitation to buy or sell any security. Capital is at risk: the value of an investment can fall as well as rise, and past performance is not a reliable indicator of future results. Tickers, ISINs, TERs and AUM are indicative, sourced from third‑party fund data as of mid‑2026, and should be verified against the current KIID / factsheet at etf.dws.com before use. High‑yield and emerging‑market bonds carry materially higher credit, liquidity and currency risk than government or investment‑grade credit; Target Maturity ETFs return capital at a stated date but, unlike a single bond, do not guarantee a fixed redemption value.
+        </div>
+        <div class="footer-mark">Xtrackers by DWS — Fixed Income</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // slide reveal + nav sync
+  const sections = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot-nav a');
+  const counter = document.getElementById('curSlide');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        const id = entry.target.id;
+        dots.forEach(d => d.classList.toggle('active', d.getAttribute('href') === '#' + id));
+        if (entry.target.dataset.index) counter.textContent = entry.target.dataset.index;
+      }
+    });
+  }, { threshold: 0.45 });
+  sections.forEach(s => io.observe(s));
+
+  // thesis scatter -> five nodes
+  (function buildScatter(){
+    const svg = document.getElementById('scatterSvg');
+    if(!svg) return;
+    const ns = 'http://www.w3.org/2000/svg';
+    const nodes = [
+      {x:360,y:70,label:'CORE'},
+      {x:378,y:130,label:'INCOME'},
+      {x:382,y:190,label:'BEYOND'},
+      {x:372,y:250,label:'MATURITY'},
+      {x:352,y:305,label:'CASH'}
+    ];
+    // scattered dots representing the broad bond universe
+    let seed = 42;
+    function rand(){ seed = (seed*9301+49297)%233280; return seed/233280; }
+    const dots = [];
+    for(let i=0;i<46;i++){
+      const x = 14 + rand()*230;
+      const y = 14 + rand()*312;
+      dots.push({x,y});
+    }
+    dots.forEach(d=>{
+      const c = document.createElementNS(ns,'circle');
+      c.setAttribute('cx', d.x); c.setAttribute('cy', d.y); c.setAttribute('r', 2.6 + rand()*2.2);
+      c.setAttribute('class','scatter-dot');
+      svg.appendChild(c);
+      // faint converging line to a random node
+      const target = nodes[Math.floor(rand()*nodes.length)];
+      const line = document.createElementNS(ns,'path');
+      const midX = (d.x + target.x)/2 + (rand()*20-10);
+      const midY = (d.y + target.y)/2 + (rand()*20-10);
+      line.setAttribute('d', `M ${d.x} ${d.y} Q ${midX} ${midY} ${target.x} ${target.y}`);
+      line.setAttribute('class','scatter-line');
+      line.setAttribute('fill','none');
+      svg.insertBefore(line, c);
+    });
+    nodes.forEach(n=>{
+      const c = document.createElementNS(ns,'circle');
+      c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', 15);
+      c.setAttribute('class','scatter-node');
+      svg.appendChild(c);
+      const t = document.createElementNS(ns,'text');
+      t.setAttribute('x', n.x); t.setAttribute('y', n.y + 26);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('class','scatter-label');
+      t.textContent = n.label;
+      svg.appendChild(t);
+    });
+  })();
+</script>
+</body>
+</html>
