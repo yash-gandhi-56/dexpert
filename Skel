@@ -1,0 +1,109 @@
+Think of every portfolio as having 5 layers:
+1. THE IDEA
+Why does this portfolio exist?
+One sentence. One tension. One hook.
+Examples:
+1 + 1 = 11 → combining complementary core exposures
+Own the Engine → equity + infrastructure + semiconductors
+The Global Barbell → quality/growth + value/cyclicality
+Built for the Cycle → assets that behave differently across regimes
+The Missing Piece → adding an exposure absent from a conventional core
+From Core to Complete → expanding a basic allocation
+The Quality Stack → multiple quality-oriented building blocks
+This is the creative identity of each portfolio.
+Not every portfolio needs to have a clever mathematical gimmick.
+2. THE BUILDING BLOCKS
+Every portfolio gets a very concise “what's inside” section.
+Not:
+ETF A tracks X, ETF B tracks Y...
+Instead:
+THE BUILD
+ETF 1 — 40%
+What exposure it gives you.
+ETF 2 — 30%
+What exposure it gives you.
+ETF 3 — 20%
+What exposure it gives you.
+ETF 4 — 10%
+What exposure it gives you.
+And then one sentence:
+Individually familiar. Collectively purposeful.
+The important thing is that the number of ETFs doesn't change the architecture.
+2, 3, 4 or 5 ETFs can all fit.
+3. THE DIFFERENCE
+This should be the analytical heart of every portfolio.
+The question is:
+What does the combination give you that the individual building blocks don't?
+This is where your enormous internal dataset becomes useful.
+I'd create a standard Portfolio Delta Engine.
+For every portfolio, calculate:
+Exposure delta
+What changes?
+Countries
+Regions
+Sectors
+Market cap
+Style
+Factors
+Currency
+Duration
+Credit
+Commodities
+etc.
+depending on the portfolio.
+Risk delta
+Volatility
+Drawdown
+Beta
+Correlation
+Tracking error
+Downside capture
+etc.
+Outcome delta
+Historical return
+Risk-adjusted return
+Regime behaviour
+Recovery characteristics
+etc.
+You don't necessarily show all of these.
+The system calculates 20 things and the designer chooses the 2–3 that tell the story.
+That's the key.
+4. THE PROOF
+This is where I think you can make the series genuinely differentiated.
+Every portfolio needs one piece of evidence that answers:
+“Okay, nice story. Show me.”
+It could be:
+Performance portfolio
+Growth of €100
+Diversification portfolio
+Rolling correlation
+Factor portfolio
+Factor exposure before vs after
+Geographic portfolio
+Market coverage
+Income portfolio
+Yield evolution
+Defensive portfolio
+Drawdown comparison
+Multi-asset portfolio
+Regime performance
+Thematic portfolio
+Exposure map
+So rather than saying:
+Every portfolio gets a performance chart.
+You say:
+Every portfolio gets a Proof Point.
+That's a much better scalable framework.
+5. THE TAKEAWAY
+Finally:
+WHAT THIS PORTFOLIO DOES
+Three bullets maximum.
+Not investment-advice language. Just characteristics.
+For example:
+Broadens
+Developed-market exposure with emerging-market equities.
+Balances
+Adds a different return and risk profile.
+Completes
+Creates a broader global equity allocation.
+For another portfolio the three words could be completely different.
